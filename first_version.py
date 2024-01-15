@@ -1,6 +1,6 @@
 import random, pygame, math, time
 
-graphs = []
+graphs = [] #hello, World of the
 found = {}
 cell = [15, 10]
 
