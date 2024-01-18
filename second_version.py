@@ -1,9 +1,17 @@
 import random, pygame, math, time
 
-class Maze():
-    def __init__(self, min_solution_length, wall_possibility , maze_size, start, player_start_coord) -> None:
+
+class Maze:
+    def __init__(
+        self,
+        min_solution_length,
+        wall_possibility,
+        maze_size,
+        start,
+        player_start_coord,
+    ):
         self.size = maze_size
-        self.wall_possibility = wall_possibility 
+        self.wall_possibility = wall_possibility
         self.walls = []
         self.test_walls = []
         self.num_vertex = 1
@@ -19,18 +27,26 @@ class Maze():
         self.solution_path = []
         self.create_flag = False
         self.player_coord = player_start_coord
-        self.player_cell = 1 + self.player_coord[1] * self.size[0] + self.player_coord[0]
+        self.player_cell = (
+            1 + self.player_coord[1] * self.size[0] + self.player_coord[0]
+        )
         self.steps = 0
         self.weights = []
         self.amt_points = 0
-    
+
     def get_random_walls(self):
         self.test_walls = []
         c = []
-        for i in range(self.wall_possibility[0] * self.size[0] + 1): c.append(0)
-        for i in range(self.wall_possibility[1] * self.size[1] + 1): c.append(1)
-        self.test_walls.append(list(random.sample(c, self.size[0]+1) for i in range(self.size[1]+1)))
-        self.test_walls.append(list(random.sample(c, self.size[0]+1) for i in range(self.size[1]+1)))
+        for i in range(self.wall_possibility[0] * self.size[0] + 1):
+            c.append(0)
+        for i in range(self.wall_possibility[1] * self.size[1] + 1):
+            c.append(1)
+        self.test_walls.append(
+            list(random.sample(c, self.size[0] + 1) for _ in range(self.size[1] + 1))
+        )
+        self.test_walls.append(
+            list(random.sample(c, self.size[0] + 1) for _ in range(self.size[1] + 1))
+        )
         for i in range(self.size[0] + 1):
             self.test_walls[0][0][self.size[0] - i] = 1
             self.test_walls[0][self.size[1]][self.size[0] - i] = 1
@@ -41,62 +57,62 @@ class Maze():
             self.test_walls[1][i][self.size[0]] = 1
         for i in range(self.size[0] + 1):
             self.test_walls[1][0][i] = 0
-    
+
     def print(self):
         for i in range(self.size[1] + 1):
-            line = ''
+            line = ""
             for j in range(self.size[0] + 1):
                 if self.test_walls[1][i][j]:
-                    line += '|'
+                    line += "|"
                 else:
-                    line += ' '
+                    line += " "
                 if self.test_walls[0][i][j]:
-                    line += '__'
+                    line += "__"
                 else:
-                    line += '  '
+                    line += "  "
             print(line)
-    
+
     def cell2coord(self, num_vertex):
         vertex_coord = []
         vertex_coord.append((num_vertex - 1) // self.size[0])
         vertex_coord.append((num_vertex - 1) % self.size[0])
         return vertex_coord
-    
+
     def coord2cell(self, coord):
         cell = 1 + coord[1] * self.size[0] + coord[0]
         return cell
-    
+
     def get_edge_list(self):
         self.vertex_coord = self.cell2coord(self.num_vertex)
         self.edge_list = []
 
         for i in range(self.vertex_coord[1], self.size[0]):
-            if self.test_walls[1][self.vertex_coord[0]+1][i+1]:
-                num = self.size[0]*self.vertex_coord[0]+i+1
+            if self.test_walls[1][self.vertex_coord[0] + 1][i + 1]:
+                num = self.size[0] * self.vertex_coord[0] + i + 1
                 if num != self.num_vertex:
                     self.edge_list.append(num)
                 break
         for i in range(self.vertex_coord[1], -1, -1):
-            if self.test_walls[1][self.vertex_coord[0]+1][i]:
-                num = self.size[0]*self.vertex_coord[0]+i+1
+            if self.test_walls[1][self.vertex_coord[0] + 1][i]:
+                num = self.size[0] * self.vertex_coord[0] + i + 1
                 if num != self.num_vertex:
                     self.edge_list.append(num)
                 break
         for i in range(self.vertex_coord[0], self.size[1]):
-            if self.test_walls[0][i+1][self.vertex_coord[1]]:
-                num = self.size[0]*i+self.vertex_coord[1]+1
+            if self.test_walls[0][i + 1][self.vertex_coord[1]]:
+                num = self.size[0] * i + self.vertex_coord[1] + 1
                 if num != self.num_vertex:
                     self.edge_list.append(num)
                 break
         for i in range(self.vertex_coord[0], -1, -1):
             if self.test_walls[0][i][self.vertex_coord[1]]:
-                num = self.size[0]*i+self.vertex_coord[1]+1
+                num = self.size[0] * i + self.vertex_coord[1] + 1
                 if num != self.num_vertex:
                     self.edge_list.append(num)
                 break
-        
+
         self.edge_list.sort()
-    
+
     def get_path(self):
         n = self.size[0] * self.size[1]
         D = [None] * (n + 1)
@@ -108,35 +124,35 @@ class Maze():
         while Qstart < len(Q):
             u = Q[Qstart]
             Qstart += 1
-            for v in self.graphs[u-1]:
+            for v in self.graphs[u - 1]:
                 if D[v] is None:
                     D[v] = D[u] + 1
                     Q.append(v)
                     Prev[v] = u
-        
+
         self.amt_points = 0
         self.test_solution_length = 0
         self.test_solution_path = []
 
-        for i in range(n+1):
+        for i in range(n + 1):
             Ans = []
             curr = i
             while curr is not None:
                 Ans.append(curr)
                 curr = Prev[curr]
-            
+
             if D[i]:
                 self.amt_points += 1
                 if self.test_solution_length < D[i]:
                     self.test_solution_length = D[i]
                     self.test_solution_path = Ans[::-1]
                     self.finish = i
-  
+
     def try_to_create(self):
         self.create_flag = False
         self.graphs = []
         self.get_random_walls()
-        for i in range(self.size[0]*self.size[1]):
+        for i in range(self.size[0] * self.size[1]):
             self.num_vertex = i + 1
             self.get_edge_list()
             self.graphs.append(self.edge_list)
@@ -155,35 +171,50 @@ class Maze():
             for j in range(self.size[0] + 1):
                 if j + 1 < len(self.walls[0][i]):
                     if self.walls[0][i][j]:
-                        pygame.draw.line(screen, color, (int(j*size_x+coord[0]), int(i*size_y+coord[1])), (int((j+1)*size_x+coord[0]), int(i*size_y+coord[1])), width_wall)
+                        pygame.draw.line(
+                            screen,
+                            color,
+                            (int(j * size_x + coord[0]), int(i * size_y + coord[1])),
+                            (
+                                int((j + 1) * size_x + coord[0]),
+                                int(i * size_y + coord[1]),
+                            ),
+                            width_wall,
+                        )
                 if i + 1 < len(self.walls[1]):
-                    if self.walls[1][i+1][j]:
-                        pygame.draw.line(screen, color, (int(j*size_x+coord[0]), int(i*size_y+coord[1])), (int(j*size_x+coord[0]), int((i+1)*size_y+coord[1])), width_wall)
-        
+                    if self.walls[1][i + 1][j]:
+                        pygame.draw.line(
+                            screen,
+                            color,
+                            (int(j * size_x + coord[0]), int(i * size_y + coord[1])),
+                            (
+                                int(j * size_x + coord[0]),
+                                int((i + 1) * size_y + coord[1]),
+                            ),
+                            width_wall,
+                        )
+
         crd = self.cell2coord(self.start)
         crd[0], crd[1] = crd[1], crd[0]
         crd[0] *= size_x
         crd[1] *= size_y
-        pygame.draw.rect(screen, (0, 230, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15))
-        pygame.draw.rect(screen, (0, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15), 5)
+        pygame.draw.rect(
+            screen, (0, 230, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15)
+        )
+        pygame.draw.rect(
+            screen, (0, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15), 5
+        )
 
         crd = self.cell2coord(self.finish)
         crd[0], crd[1] = crd[1], crd[0]
         crd[0] *= size_x
         crd[1] *= size_y
-        pygame.draw.rect(screen, (230, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15))
-        pygame.draw.rect(screen, (0, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15), 5)
-        
-        # text_style = pygame.font.Font(None, 20)
-        # for i in range(len(self.weights)):
-        #     text_num = text_style.render(str(self.weights[i]), 1, (0, 0, 0))
-        #     coord = self.cell2coord(i)
-        #     coord[0], coord[1] = coord[1], coord[0]
-        #     coord[0] *= size_x
-        #     coord[0] += size_x / 2
-        #     coord[1] *= size_y
-        #     coord[1] += size_y / 2
-        #     screen.blit(text_num, coord)
+        pygame.draw.rect(
+            screen, (230, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15)
+        )
+        pygame.draw.rect(
+            screen, (0, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15), 5
+        )
 
 
 if __name__ == "__main__":
@@ -212,7 +243,7 @@ if __name__ == "__main__":
                 step = 2
             else:
                 TMP_i += 1
-        
+
         if step == 2:
             screen.fill(color_screen)
             maze.draw((0, 0, 0), [2, 2], [320, 640], 5)
@@ -229,7 +260,6 @@ if __name__ == "__main__":
                 step = 1
             pygame.display.flip()
 
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 step = 0
