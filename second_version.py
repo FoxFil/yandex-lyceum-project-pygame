@@ -5,18 +5,20 @@ class Maze:
     def __init__(
         self,
         min_solution_length,
-        wall_possibility,
-        maze_size,
-        start,
-        player_start_coord,
+        wall_possibility,  # дробь отношения (например 10 к 1): 1 - что стенка есть, 10 - что нет.
+        maze_size,  # размер окна в клетках
+        start,  # первая координата в списке
+        player_start_coord,  # где начинает игрок
     ):
         self.size = maze_size
         self.wall_possibility = wall_possibility
-        self.walls = []
-        self.test_walls = []
-        self.num_vertex = 1
-        self.vertex_coord = []
-        self.edge_list = []
+        self.walls = []  # 100% правильные уже отрисованные стенки лабиринта
+        self.test_walls = (
+            []
+        )  # не факт что правильные стенки. Используется при генерации self.walls
+        self.num_vertex = 1  # номер вершины
+        self.vertex_coord = []  # не номер, а координата
+        self.edge_list = []  # список смежностей (куда мы можем попасть из клетки)
         self.graphs = []
         self.start = start
         self.finish = 0
@@ -26,7 +28,9 @@ class Maze:
         self.solution_length = 0
         self.solution_path = []
         self.create_flag = False
-        self.player_coord = player_start_coord
+        self.player_coord = (
+            player_start_coord  # player не отрисовывается, поэтому ничего нет
+        )
         self.player_cell = (
             1 + self.player_coord[1] * self.size[0] + self.player_coord[0]
         )
@@ -130,7 +134,7 @@ class Maze:
                     Q.append(v)
                     Prev[v] = u
 
-        self.amt_points = 0
+        self.amt_points = 0  # кол-во точек, в которое можно попасть
         self.test_solution_length = 0
         self.test_solution_path = []
 
@@ -150,26 +154,37 @@ class Maze:
 
     def try_to_create(self):
         self.create_flag = False
-        self.graphs = []
+        self.graphs = (
+            []
+        )  # граф еще не создан. В итоге тут будут все клетки куда можно отсюда попасть
         self.get_random_walls()
-        for i in range(self.size[0] * self.size[1]):
+        for i in range(
+            self.size[0] * self.size[1]
+        ):  # для каждой клетки создается список смежных клеток.
             self.num_vertex = i + 1
             self.get_edge_list()
-            self.graphs.append(self.edge_list)
-        self.get_path()
-        if self.test_solution_length > 15 and self.amt_points > 20:
+            self.graphs.append(self.edge_list)  # добавляем все связи в граф
+        self.get_path()  # исчет путь
+        if (
+            self.test_solution_length
+            > self.min_solution_length  # and self.amt_points > 20
+        ):  # проверка на правильность лабиринта
             self.walls = self.test_walls.copy()
             self.solution_length = self.test_solution_length
             self.solution_path = self.test_solution_path.copy()
             self.create_flag = True
+            print(self.graphs)
             print(self.cell2coord(self.finish))
 
-    def draw(self, color, coord, size, width_wall):
-        size_x = size[0] / self.size[0]
-        size_y = size[1] / self.size[1]
+    def draw(
+        self, color, coord, size, width_wall
+    ):  # coord - отступ от левого верх угла
+        size_x = size[0] / self.size[0]  # размер клетки по X
+        size_y = size[1] / self.size[1]  # размер клетки по Y
         for i in range(self.size[1] + 1):
             for j in range(self.size[0] + 1):
                 if j + 1 < len(self.walls[0][i]):
+                    # проверка на стенки и рисование стенок
                     if self.walls[0][i][j]:
                         pygame.draw.line(
                             screen,
@@ -229,7 +244,7 @@ if __name__ == "__main__":
 
     keydown = []
 
-    maze = Maze(20, [10, 1], [8, 16], 1, [2, 2])
+    maze = Maze(20, [10, 1], [8, 16], 1, [2, 2])  #
 
     step = 1
     TMP_i = 0
