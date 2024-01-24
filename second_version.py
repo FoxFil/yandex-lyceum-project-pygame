@@ -231,6 +231,47 @@ class Maze:
             screen, (0, 0, 0), (crd[0] + 10, crd[1] + 10, size_x - 15, size_y - 15), 5
         )
 
+    def if_wall_at_right(self):
+        current_coords = self.player_coord
+        print(current_coords)
+        vert_walls = self.walls[1][current_coords[1]]
+        if vert_walls[current_coords[0]]:
+            return True
+        return False
+
+    def draw_player(self, size):
+        self.player_cell = self.coord2cell(self.player_coord)
+
+        size_x = size[0] / self.size[0]
+        size_y = size[1] / self.size[1]
+
+        crd = self.cell2coord(self.player_cell)
+        crd[0], crd[1] = crd[1], crd[0]
+        crd[0] *= size_x
+        crd[1] *= size_y
+
+        pygame.draw.rect(
+            screen,
+            (255, 165, 0),
+            (
+                crd[0] + 10,
+                crd[1] + 10,
+                size_x - 15,
+                size_y - 15,
+            ),
+        )
+        pygame.draw.rect(
+            screen,
+            (0, 0, 0),
+            (
+                crd[0] + 10,
+                crd[1] + 10,
+                size_x - 15,
+                size_y - 15,
+            ),
+            5,
+        )
+
 
 if __name__ == "__main__":
     pygame.init()
@@ -244,7 +285,7 @@ if __name__ == "__main__":
 
     keydown = []
 
-    maze = Maze(20, [10, 1], [8, 16], 1, [2, 2])  #
+    maze = Maze(20, [10, 1], [8, 16], 1, [1, 1])  #
 
     step = 1
     TMP_i = 0
@@ -262,6 +303,7 @@ if __name__ == "__main__":
         if step == 2:
             screen.fill(color_screen)
             maze.draw((0, 0, 0), [2, 2], [320, 640], 5)
+            maze.draw_player([320, 640])
             if pygame.K_BACKSPACE in keydown:
                 flag = True
                 while flag:
@@ -272,7 +314,22 @@ if __name__ == "__main__":
                                 flag = False
                                 break
                 maze.start = maze.finish
+                maze.player_coord = list(
+                    map(lambda x: x + 1, maze.cell2coord(maze.start))
+                )[::-1]
                 step = 1
+            if pygame.K_d in keydown:
+                flag = True
+                while flag:
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYUP:
+                            keydown.remove(event.key)
+                            if event.key == pygame.K_d:
+                                flag = False
+                                break
+                maze.if_wall_at_right()
+                while not maze.if_wall_at_right():
+                    maze.player_coord[0] += 1
             pygame.display.flip()
 
         for event in pygame.event.get():
