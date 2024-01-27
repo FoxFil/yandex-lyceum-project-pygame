@@ -1,4 +1,4 @@
-import random, pygame, math, time
+import random, pygame, time
 
 
 class Maze:
@@ -436,3 +436,11 @@ if __name__ == "__main__":
         clock.tick()
 
     pygame.quit()
+
+
+# закоментить get path
+# requirements 💚
+# стартовое финальное окно
+# подсчет результатов
+# структура
+# спрайты collide
