@@ -53,7 +53,6 @@ def start_final_window(given_score):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Если произошло нажатие на кнопку "New Game"
                 if new_game_button.rect.collidepoint(event.pos):
-                    # Добавьте свою логику для начала игры
                     return True
 
         # Очистка экрана и отображение фона
