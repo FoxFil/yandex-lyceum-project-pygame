@@ -358,15 +358,13 @@ def start_the_game():
             maze.try_to_create()
             if maze.create_flag:
                 maze.print()
-                print(TMP_i, maze.solution_length)
+                print("attempts to generate this maze:", TMP_i)
                 TMP_i = 0
                 step = 2
-                print("steps:", steps_player_count)
-                print("time:", round(time_elapsed))
 
-                prev_points = final_points
+                points_for_the_round = 0
                 if steps_player_count != 0:
-                    final_points += (
+                    points_for_the_round = (
                         (maze.min_solution_length * default_time_per_step)
                         / max(
                             time_elapsed,
@@ -374,8 +372,11 @@ def start_the_game():
                         )
                         + maze.min_solution_length / steps_player_count
                     ) * 50
+                    if points_for_the_round >= 94:
+                        points_for_the_round = 100
+                    final_points += points_for_the_round
 
-                print("points for that game:", final_points - prev_points)
+                print("points for that game:", points_for_the_round)
 
                 games_count += 1
                 steps_player_count = 0

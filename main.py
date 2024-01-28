@@ -1,5 +1,6 @@
 from game_windows.start_window import start_starting_window
 from game_windows.game import start_the_game
+import pygame
 
 
 def main():
@@ -8,7 +9,7 @@ def main():
         game_running = start_starting_window()
         while game_running:
             start_the_game()
-    except:
+    except pygame.error:
         pass
 
 
