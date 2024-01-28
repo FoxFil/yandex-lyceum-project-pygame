@@ -196,8 +196,6 @@ def start_the_game():
                 self.solution_length = self.test_solution_length
                 self.solution_path = self.test_solution_path.copy()
                 self.create_flag = True
-                print(self.graphs)
-                print(self.cell2coord(self.finish))
 
         def draw(
             self, color, coord, size, width_wall

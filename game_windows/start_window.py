@@ -50,7 +50,6 @@ def start_starting_window():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # если нажали на кнопку
                 if start_button.rect.collidepoint(event.pos):
-                    print("button pressed")
                     return start_the_game()
 
 
